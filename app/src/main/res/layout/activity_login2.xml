@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".auth.Login">
+    tools:context=".auth.LetUInActivity">
 
     <TextView
-        android:id="@+id/create_your_lbl"
+        android:id="@+id/login_to_your_lbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="145dp"
@@ -35,11 +35,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_your_lbl" />
+        app:layout_constraintTop_toBottomOf="@+id/login_to_your_lbl" />
 
 
     <Button
-        android:id="@+id/sign_up_btn"
+        android:id="@+id/login_btn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="45dp"
@@ -76,17 +76,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/sign_up_txt"
+    <Button
+        android:id="@+id/button"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="26dp"
+        android:layout_marginBottom="10dp"
         android:fontFamily="@font/montserrat_regular"
         android:text="@string/sign_up"
         android:textAllCaps="false"
-        android:textColor="@color/main"
+        android:theme="@style/Theme.light_main"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView3" />
 
