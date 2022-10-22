@@ -25,4 +25,6 @@
     <string name="sign_up_with_google">sign up with google</string>
     <string name="already_have_an_account">Already have an account ?</string>
     <string name="sign_in">Sign in</string>
+    <string name="login_to_your">Login to your</string>
+    <string name="forgot_the_password">Forgot the password?</string>
 </resources>
