@@ -10,5 +10,6 @@
     <color name="main">#FFBC0063</color>
     <color name="light_gray">#FFD9D9D9</color>
     <color name="light_gray_50">#80D9D9D9</color>
+    <color name="light">#FFCACACA</color>
 
 </resources>

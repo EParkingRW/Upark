@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/savedMenuItem"
+        android:title="@string/saved"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_baseline_bookmark_24"
+        />
+    <item android:id="@+id/ClassesMenuItem"
+        android:title="@string/history"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_baseline_list_alt_24"
+        />
+    <item android:id="@+id/homeMenuItem"
+        android:title="@string/home"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/home_menu_btn"
+        />
+    <item android:id="@+id/meMenuItem"
+        android:title="@string/profile"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_baseline_person_24"
+        />
+</menu>
