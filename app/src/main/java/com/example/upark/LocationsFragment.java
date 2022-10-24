@@ -3,16 +3,13 @@ package com.example.upark;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.upark.databinding.ActivityMapsBinding;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -34,7 +31,6 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
 
     // TODO: Rename and change types of parameters
     private GoogleMap mMap;
-    private ActivityMapsBinding binding;
 
     public LocationsFragment() {
         // Required empty public constructor
