@@ -1,54 +1,45 @@
 package com.example.upark;
 
-import static android.content.Context.LOCATION_SERVICE;
-
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.upark.helpers.InfoWindowAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-
-import java.util.concurrent.Executor;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LocationsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LocationsFragment extends Fragment implements OnMapReadyCallback, LocationListener, LocationSource {
+public class LocationsFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationClient;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
     private GoogleMap mMap;
-    private OnLocationChangedListener mListener;
-    private LocationManager locationManager;
 
     public LocationsFragment() {
         // Required empty public constructor
@@ -85,61 +76,44 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback, L
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_locations, container, false);
 
-
-//        binding = ActivityMapsBinding.inflate(inflater);
-//        this.requireActivity().setContentView(binding.getRoot());
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         // Async map
+        assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
 
         return view;
     }
+    private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
+        // below line is use to generate a drawable.
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+
+        // below line is use to set bounds to our vector drawable.
+        assert vectorDrawable != null;
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+
+        // below line is use to create a bitmap for our
+        // drawable which we have added.
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
+        // below line is use to add bitmap in our canvas.
+        Canvas canvas = new Canvas(bitmap);
+
+        // below line is use to draw our
+        // vector drawable in canvas.
+        vectorDrawable.draw(canvas);
+
+        // after generating our bitmap we are returning our bitmap.
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
 
     @Override @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-
-        mMap.setLocationSource(this);
-
-
-        locationManager = (LocationManager) this.requireActivity().getSystemService(LOCATION_SERVICE);
-
-        if(locationManager != null)
-        {
-            boolean gpsIsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            boolean networkIsEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            if(gpsIsEnabled)
-            {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000L, 10F, this);
-            }
-            else if(networkIsEnabled)
-            {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000L, 10F, this);
-            }
-            else
-            {
-                //Show an error dialog that GPS is disabled.
-            }
-        }
-        else
-        {
-            //Show a generic error dialog since LocationManager is null for some reason
-        }
-
-
-
-
-
-
-
+        mMap.setInfoWindowAdapter(new InfoWindowAdapter(getActivity()));
 
         mMap.setMyLocationEnabled(true);
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener( this.requireActivity(), location -> {
                     // Got last known location. In some rare situations this can be null.
@@ -147,67 +121,15 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback, L
                         LatLng sydney = new LatLng(location.getLatitude(), location.getLongitude());
 
                         Log.d("GPSTag", "the use location gotten ");
-                        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+                        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+                        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney")
+                                // below line is use to add custom marker on our map.
+                                .icon(BitmapFromVector(this.requireContext(), R.drawable.ic_baseline_local_parking_24)));
+
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
                         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney,10));
                     }
                 });
 
-        googleMap.setOnMapClickListener(latLng -> {
-            // When clicked on map
-            // Initialize marker options
-            MarkerOptions markerOptions=new MarkerOptions();
-            // Set position of marker
-            markerOptions.position(latLng);
-            // Set title of marker
-            markerOptions.title(latLng.latitude+" : "+latLng.longitude);
-            // Remove all marker
-            googleMap.clear();
-            // Animating to zoom the marker
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
-            // Add marker on map
-            googleMap.addMarker(markerOptions);
-        });
-    }
-
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        if( mListener != null )
-        {
-            mListener.onLocationChanged( location );
-
-            //Move the camera to the user's location once it's available!
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
-        }
-    }
-
-    @Override
-    public void activate(@NonNull OnLocationChangedListener onLocationChangedListener) {
-        mListener = onLocationChangedListener;
-    }
-
-    @Override
-    public void deactivate() {
-        mListener = null;
-    }
-    @Override
-    public void onProviderDisabled(String provider)
-    {
-        // TODO Auto-generated method stub
-        Toast.makeText(this.requireActivity(), "provider disabled", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onProviderEnabled(String provider)
-    {
-        // TODO Auto-generated method stub
-        Toast.makeText(this.requireActivity(), "provider enabled", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras)
-    {
-        // TODO Auto-generated method stub
-        Toast.makeText(this.requireActivity(), "status changed", Toast.LENGTH_SHORT).show();
     }
 }
