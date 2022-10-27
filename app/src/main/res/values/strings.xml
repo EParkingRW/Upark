@@ -33,4 +33,9 @@
     <string name="profile">Profile</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="details">Details</string>
+    <string name="rubangura_basement_park">Rubangura basement park</string>
+    <string name="kv_123_v_kigali">kv 123 v, kigali</string>
+    <string name="close">Close</string>
+    <string name="image">Image</string>
 </resources>
