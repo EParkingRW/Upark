@@ -26,6 +26,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.upark.helpers.CustomImageView;
 import com.example.upark.helpers.InfoWindowAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -91,7 +92,6 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         // Async map
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
-
 
         return view;
     }
