@@ -3,6 +3,7 @@ package com.example.upark;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -51,6 +52,7 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
     // TODO: Rename and change types of parameters
     private GoogleMap mMap;
     Marker myMarker;
+    Intent parking_details;
 
     public LocationsFragment() {
         // Required empty public constructor
@@ -123,7 +125,9 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
         mMap.setInfoWindowAdapter(new InfoWindowAdapter(getActivity()));
 
-        mMap.setMyLocationEnabled(true);
+        try {
+            mMap.setMyLocationEnabled(true);
+        }catch (Exception e){e.printStackTrace();}
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener( this.requireActivity(), location -> {
                     // Got last known location. In some rare situations this can be null.
@@ -157,6 +161,19 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         Button close_btn = dialog.findViewById(R.id.close_btn);
         close_btn.setOnClickListener(listener -> dialog.dismiss());
         Button showDetails = dialog.findViewById(R.id.details_btn);
+        showDetails.setOnClickListener(view -> {
+            try {
+                if(parking_details == null){
+                    parking_details = new Intent(requireActivity(), ParkingLotDetails.class);
+                }
+                dialog.dismiss();
+                startActivity(parking_details);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        });
+
         dialog.show();
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

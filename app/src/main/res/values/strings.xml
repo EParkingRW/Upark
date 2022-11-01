@@ -38,4 +38,11 @@
     <string name="kv_123_v_kigali">kv 123 v, kigali</string>
     <string name="close">Close</string>
     <string name="image">Image</string>
+    <string name="parking_details">Parking Details</string>
+    <string name="_2_km">2 Km</string>
+    <string name="_8_am_10pm">8 AM - 10PM</string>
+    <string name="description">Description</string>
+    <string name="lorem_ipsum">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining</string>
+    <string name="_2_02">$2.02</string>
+    <string name="per_hour">per hour</string>
 </resources>
