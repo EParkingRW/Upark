@@ -3,7 +3,6 @@ package com.example.upark;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -18,17 +17,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 
-import com.example.upark.helpers.CustomImageView;
+import com.example.upark.helpers.B;
+import com.example.upark.helpers.ImageLoadTask;
 import com.example.upark.helpers.InfoWindowAdapter;
+import com.example.upark.models.Garage;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -51,8 +53,15 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
 
     // TODO: Rename and change types of parameters
     private GoogleMap mMap;
-    Marker myMarker;
-    Intent parking_details;
+    private Marker myMarker;
+
+    // dialog variables
+    private Dialog dialog;
+    private Button close_btn;
+    private Button showDetails;
+    private TextView garage_name;
+    private TextView garage_address;
+    private ImageView garage_image_view;
 
     public LocationsFragment() {
         // Required empty public constructor
@@ -133,41 +142,44 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
                         LatLng sydney = new LatLng(location.getLatitude(), location.getLongitude());
-
-                        Log.d("GPSTag", "the use location gotten ");
-                        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-                        MarkerOptions markerOptions = new MarkerOptions().position(sydney).title("Marker in Sydney")
-                                // below line is use to add custom marker on our map.
-                                .icon(BitmapFromVector(this.requireContext(), R.drawable.ic_baseline_local_parking_24));
-                        myMarker = mMap.addMarker(markerOptions);
-                        mMap.setOnMarkerClickListener(marker -> {
-                            if(marker.equals(myMarker)){
-                                showDialog();
-                            }
-                            return false;
-                        });
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney,10));
+                        Log.d("location", "your location is "+ sydney);
                     }
                 });
 
+        B.getInstance().onGarageReady(this::showGarage);
     }
-    private void showDialog() {
+    private void showGarageDialog(Garage garage) {
 
-        final Dialog dialog = new Dialog(this.requireActivity());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.details_dialog);
 
-        Button close_btn = dialog.findViewById(R.id.close_btn);
+        if(dialog == null){
+            dialog = new Dialog(this.requireActivity());
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.details_dialog);
+
+            close_btn = dialog.findViewById(R.id.close_btn);
+            showDetails = dialog.findViewById(R.id.details_btn);
+            garage_name = dialog.findViewById(R.id.garage_name);
+            garage_address = dialog.findViewById(R.id.garage_address);
+            garage_image_view = dialog.findViewById(R.id.garage_image_view);
+
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+            dialog.getWindow().setGravity(Gravity.BOTTOM);
+        }
+        garage_name.setText(garage.getName());
+        garage_address.setText(garage.getAddress());
+        try {
+            Consumer<Bitmap> onImageReady = (image) -> garage_image_view.setImageBitmap(image);
+            new ImageLoadTask(garage.getImageURL(), onImageReady).execute();
+        }catch (Exception e){e.printStackTrace();}
+
         close_btn.setOnClickListener(listener -> dialog.dismiss());
-        Button showDetails = dialog.findViewById(R.id.details_btn);
         showDetails.setOnClickListener(view -> {
             try {
-                if(parking_details == null){
-                    parking_details = new Intent(requireActivity(), ParkingLotDetails.class);
-                }
                 dialog.dismiss();
-                startActivity(parking_details);
+
+                requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, ParkingPlaceDatails.newInstance(garage)).commit();
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -175,10 +187,28 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         });
 
         dialog.show();
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-        dialog.getWindow().setGravity(Gravity.BOTTOM);
 
+    }
+
+    public void showGarage(Garage garage){
+        if(garage == null){
+            return;
+        }
+        LatLng sydney = new LatLng(garage.getLatitude(), garage.getLongitude());
+
+        Log.d("GPSTag", "the use location gotten ");
+        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        MarkerOptions markerOptions = new MarkerOptions().position(sydney).title("Marker in Sydney")
+                // below line is use to add custom marker on our map.
+                .icon(BitmapFromVector(this.requireContext(), R.drawable.ic_baseline_local_parking_24));
+        myMarker = mMap.addMarker(markerOptions);
+        mMap.setOnMarkerClickListener(marker -> {
+            if(marker.equals(myMarker)){
+                showGarageDialog(garage);
+            }
+            return false;
+        });
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney,10));
     }
 }
