@@ -19,6 +19,7 @@ public class Garage implements Serializable {
     private int slots;
     private int takenSlots;
     private final MutableLiveData<Integer> availableSlots;
+    private String userId;
 
     public Garage(double latitude, double longitude, int slots){
         this.latitude = latitude;
@@ -143,5 +144,34 @@ public class Garage implements Serializable {
     }
     public String getHourFeesDisplay(){
         return "RWF " + hourFees;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "Garage{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", imageURL='" + imageURL + '\'' +
+                ", CompanyId='" + CompanyId + '\'' +
+                ", hourFees=" + hourFees +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", address='" + address + '\'' +
+                ", description='" + description + '\'' +
+                ", slots=" + slots +
+                ", takenSlots=" + takenSlots +
+                ", availableSlots=" + availableSlots +
+                ", userId='" + userId + '\'' +
+                '}';
     }
 }

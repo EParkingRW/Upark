@@ -43,6 +43,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Objects;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LocationsFragment#newInstance} factory method to
@@ -146,7 +148,7 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
                     }
                 });
 
-        B.getInstance().onGarageReady(this::showGarage);
+        B.getInstance().onGarageReady(garage -> requireActivity().runOnUiThread(()-> showGarage(garage)));
     }
     private void showGarageDialog(Garage garage) {
 
