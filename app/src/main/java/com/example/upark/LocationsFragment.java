@@ -3,6 +3,7 @@ package com.example.upark;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,7 +45,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,7 +58,7 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
 
     // TODO: Rename and change types of parameters
     private GoogleMap mMap;
-    private Marker myMarker;
+//    private Marker myMarker;
 
     // dialog variables
     private Dialog dialog;
@@ -64,9 +67,11 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
     private TextView garage_name;
     private TextView garage_address;
     private ImageView garage_image_view;
+    private final Map<Marker, Garage> markerGarageMap;
 
     public LocationsFragment() {
         // Required empty public constructor
+        markerGarageMap = new HashMap<>();
     }
 
     /**
@@ -105,6 +110,25 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         // Async map
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
+
+        final ImageButton[] notificationBtn = {view.findViewById(R.id.notification_btn)};
+
+        final Intent[] notificationIntent = {null};
+        final Intent[] searchIntent = {null};
+
+        notificationBtn[0].setOnClickListener(l ->{
+            if(notificationIntent[0] == null){
+                notificationIntent[0] = new Intent(this.requireActivity(), NotificationActivity.class);
+            }
+            requireActivity().startActivity(notificationIntent[0]);
+        });
+        ImageButton searchBtn = view.findViewById(R.id.search_btn);
+        searchBtn.setOnClickListener(l ->{
+            if(searchIntent[0] == null){
+                searchIntent[0] = new Intent(this.requireActivity(), SearchActivity.class);
+            }
+            startActivity(searchIntent[0]);
+        });
 
         return view;
     }
@@ -149,6 +173,13 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
                 });
 
         B.getInstance().onGarageReady(garage -> requireActivity().runOnUiThread(()-> showGarage(garage)));
+        mMap.setOnMarkerClickListener(marker -> {
+//            if(marker.equals(myMarker)){
+//                showGarageDialog(garage);
+//            }
+            showGarageDialog(markerGarageMap.get(marker));
+            return false;
+        });
     }
     private void showGarageDialog(Garage garage) {
 
@@ -203,13 +234,8 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         MarkerOptions markerOptions = new MarkerOptions().position(sydney).title("Marker in Sydney")
                 // below line is use to add custom marker on our map.
                 .icon(BitmapFromVector(this.requireContext(), R.drawable.ic_baseline_local_parking_24));
-        myMarker = mMap.addMarker(markerOptions);
-        mMap.setOnMarkerClickListener(marker -> {
-            if(marker.equals(myMarker)){
-                showGarageDialog(garage);
-            }
-            return false;
-        });
+        Marker myMarker = mMap.addMarker(markerOptions);
+        markerGarageMap.put(myMarker, garage);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney,10));
     }

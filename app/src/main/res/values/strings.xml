@@ -46,4 +46,14 @@
     <string name="_2_02">$2.02</string>
     <string name="per_hour">per hour</string>
     <string name="_kg">_kg</string>
+    <string name="search">Search</string>
+    <string name="notification">Notification</string>
+    <string name="result">Result</string>
+    <string name="filter">Filter</string>
+    <string name="distance">Distance</string>
+    <string name="slots_available">Slots Available</string>
+    <string name="reset">Reset</string>
+    <string name="apply_filter">Apply Filter</string>
+    <string name="lower_price">Lower Price</string>
+    <string name="sort_by">Sort by</string>
 </resources>

@@ -50,6 +50,9 @@ public class B {
         };
         GarageBackend.getGarages(context, onReady);
     }
+    public ObservableArrayList<Garage> getGarages(){
+        return this.garages;
+    }
 
 
 
