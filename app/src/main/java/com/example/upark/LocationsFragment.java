@@ -158,7 +158,7 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
     @Override @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setInfoWindowAdapter(new InfoWindowAdapter(getActivity()));
+        mMap.setInfoWindowAdapter(new InfoWindowAdapter(requireActivity()));
 
         try {
             mMap.setMyLocationEnabled(true);
@@ -172,14 +172,19 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
                     }
                 });
 
-        B.getInstance().onGarageReady(garage -> requireActivity().runOnUiThread(()-> showGarage(garage)));
+        B.getInstance().onGarageReady(garage -> requireActivity().runOnUiThread(()-> {
+            try {
+                showGarage(garage);
+            }catch (Exception exception){
+                Log.e(this.getClass().getSimpleName(), exception.getMessage() + "");
+            }
+
+        }));
         mMap.setOnMarkerClickListener(marker -> {
-//            if(marker.equals(myMarker)){
-//                showGarageDialog(garage);
-//            }
             showGarageDialog(markerGarageMap.get(marker));
             return false;
         });
+        mMap.setOnInfoWindowClickListener(marker -> showGarageDialog(markerGarageMap.get(marker)));
     }
     private void showGarageDialog(Garage garage) {
 
@@ -208,11 +213,12 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         }catch (Exception e){e.printStackTrace();}
 
         close_btn.setOnClickListener(listener -> dialog.dismiss());
+        Intent intent = new Intent(this.requireActivity(), GarageDetails.class);
         showDetails.setOnClickListener(view -> {
             try {
                 dialog.dismiss();
-
-                requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, ParkingPlaceDatails.newInstance(garage)).commit();
+                intent.putExtra("garageId", garage.getId());
+                requireActivity().startActivity(intent);
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -231,12 +237,15 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
 
         Log.d("GPSTag", "the use location gotten ");
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        MarkerOptions markerOptions = new MarkerOptions().position(sydney).title("Marker in Sydney")
+        MarkerOptions markerOptions = new MarkerOptions().position(sydney).title(garage.getName())
                 // below line is use to add custom marker on our map.
                 .icon(BitmapFromVector(this.requireContext(), R.drawable.ic_baseline_local_parking_24));
         Marker myMarker = mMap.addMarker(markerOptions);
         markerGarageMap.put(myMarker, garage);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney,10));
+        if(myMarker != null){
+            myMarker.showInfoWindow();
+        }
     }
 }

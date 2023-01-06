@@ -1,6 +1,7 @@
 package com.example.upark;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -14,35 +15,28 @@ import android.widget.SeekBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.upark.adapters.GarageAdapter;
 import com.example.upark.customViews.CustomEditText;
 import com.example.upark.customViews.DrawableClickListener;
+import com.example.upark.helpers.B;
 import com.google.android.material.button.MaterialButton;
 
-import java.security.SecureRandom;
-
-enum SortBy{DISTANCE, SLOTS_AVAILABLE, LOWER_PRICE}
-class Filters{
-    public SortBy sortBy;
-    public int distanceRange;
-    public int maxRange;
-    public Filters(){
-        sortBy = SortBy.DISTANCE;
-        maxRange = 100;
-        distanceRange = maxRange/2;
-    }
-}
 public class SearchActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private CustomEditText searchEditText;
+    private RecyclerView garageListRecycler;
+    private GarageAdapter garageAdapter;
 
 //    dialog variables
-    private SeekBar rangeInput;
+    private SeekBar rangeDistanceInput;
     private MaterialButton sortByDistance;
     private MaterialButton sortByAvailableSlots;
     private MaterialButton sortByLowerPrice;
-    private Button restButton;
-    private Button applyFilter;
+    private Button resetButton;
+    private Button applyFilterBtn;
 
 
 
@@ -56,17 +50,40 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        try {
+            garageAdapter = new GarageAdapter(B.getInstance().getGarages());
+            Intent intent = new Intent(this, GarageDetails.class);
+
+            garageAdapter.setListener(garage -> {
+                try {
+                    intent.putExtra("garageId", garage.getId());
+                    startActivity(intent);
+                }catch (Exception e){
+                    Log.e(TAG,"Error: "+ e.getMessage());
+                    e.printStackTrace();
+                }});
 
 
-        Toolbar toolbar = findViewById(R.id.main_toolbar);
-        setSupportActionBar(toolbar);
-        searchEditText = findViewById(R.id.editTextSearch);
+            Toolbar toolbar = findViewById(R.id.appBar);
+            garageListRecycler = findViewById(R.id.garageListRecycler);
 
-        searchEditText.setDrawableClickListener(target -> {
-            if (target == DrawableClickListener.DrawablePosition.RIGHT) {
-                showFilterDialog();
-            }
-        });
+            toolbar.setNavigationOnClickListener(v -> finish());
+
+
+            searchEditText = findViewById(R.id.editTextSearch);
+
+            searchEditText.setDrawableClickListener(target -> {
+                if (target == DrawableClickListener.DrawablePosition.RIGHT) {
+                    showFilterDialog();
+                }
+            });
+
+//        garageListRecycler.setHasFixedSize(true);
+            garageListRecycler.setLayoutManager(new LinearLayoutManager(this));
+            garageListRecycler.setVerticalScrollBarEnabled(true);
+            garageListRecycler.setAdapter(garageAdapter);
+        }catch (Exception e){Log.e(TAG, "Error: "+e.getMessage());}
+
 
     }
     private void showFilterDialog(){
@@ -75,12 +92,12 @@ public class SearchActivity extends AppCompatActivity {
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.seach_filter_dialog);
 
-            rangeInput = dialog.findViewById(R.id.rangeInput);
+            rangeDistanceInput = dialog.findViewById(R.id.rangeInput);
             sortByDistance = dialog.findViewById(R.id.sortByDistance);
             sortByAvailableSlots = dialog.findViewById(R.id.sortByAvailableSlots);
             sortByLowerPrice = dialog.findViewById(R.id.sortByLowerPrice);
-            restButton = dialog.findViewById(R.id.restButton);
-            applyFilter = dialog.findViewById(R.id.applyFilter);
+            resetButton = dialog.findViewById(R.id.resetButton);
+            applyFilterBtn = dialog.findViewById(R.id.applyFilter);
 
 
             dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -95,17 +112,38 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void initiateBehaviorAndValues() {
-        rangeInput.setMax(filter.maxRange);
+        rangeDistanceInput.setMax(filter.maxDistanceRange);
         sortByAvailableSlots.setOnClickListener(v -> {
             changeButtonColor(sortByAvailableSlots);
+            filter.sortBy = SortBy.SLOTS_AVAILABLE;
         });
         sortByDistance.setOnClickListener(v -> {
             changeButtonColor(sortByDistance);
+            filter.sortBy = SortBy.DISTANCE;
         });
         sortByLowerPrice.setOnClickListener(v -> {
             changeButtonColor(sortByLowerPrice);
+            filter.sortBy = SortBy.LOWER_PRICE;
+        });
+        resetButton.setOnClickListener(v -> {
+            filter.reset();
+            dialog.dismiss();
+        });
+        applyFilterBtn.setOnClickListener(v -> {
+            dialog.dismiss();
+            applyFilters(filter);
+        });
+        rangeDistanceInput.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+               filter.maxDistanceRange = progress;
+            }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) { /*This method is called when the user starts dragging the slider.*/}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {/*This method is called when the user stops dragging the slider.*/}
         });
 
+    }
+    private void applyFilters(Filters filter){
 
     }
     private void changeButtonColor(MaterialButton activeButton){
@@ -124,5 +162,19 @@ public class SearchActivity extends AppCompatActivity {
             sortByAvailableSlots.setTextColor(ContextCompat.getColor(this, R.color.main));
         }
 
+    }
+    enum SortBy{DISTANCE, SLOTS_AVAILABLE, LOWER_PRICE}
+    static class Filters{
+        public SortBy sortBy;
+        public int distanceRange;
+        public int maxDistanceRange;
+        public Filters(){
+            reset();
+        }
+        public void reset(){
+            sortBy = SortBy.DISTANCE;
+            maxDistanceRange = 100;
+            distanceRange = maxDistanceRange;
+        }
     }
 }

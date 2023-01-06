@@ -10,6 +10,8 @@
     <color name="main">#FFBC0063</color>
     <color name="light_gray">#FFD9D9D9</color>
     <color name="light_gray_50">#80D9D9D9</color>
+    <color name="light_gray_new">#F0F0F0</color>
+
     <color name="light">#FFCACACA</color>
     <color name="light_coral">#FFEC8585</color>
     <color name="think_white">#FFF4F4F4</color>

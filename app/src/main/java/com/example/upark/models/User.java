@@ -1,8 +1,9 @@
 package com.example.upark.models;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class User {
+public class User implements Serializable {
     private String id;
     private String fullName;
     private String userName;

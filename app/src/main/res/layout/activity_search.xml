@@ -66,8 +66,9 @@
         app:layout_constraintTop_toBottomOf="@+id/view" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="409dp"
-        android:layout_height="563dp"
+        android:id="@+id/garageListRecycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="1dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="1dp"

@@ -56,4 +56,12 @@
     <string name="apply_filter">Apply Filter</string>
     <string name="lower_price">Lower Price</string>
     <string name="sort_by">Sort by</string>
+    <string name="todo">TODO</string>
+    <string name="near_parking_are_around_you">near parking are around you</string>
+    <string name="_hour">/hour</string>
+    <string name="_500">500</string>
+    <string name="available_slots">Available slots</string>
+    <string name="space_available">Space available</string>
+    <string name="makuza_has_a_space_to_park">Makuza has a space to park</string>
+    <string name="space_full">Space full</string>
 </resources>

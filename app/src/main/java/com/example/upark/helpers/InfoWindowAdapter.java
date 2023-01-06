@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.upark.R;
@@ -13,33 +14,30 @@ import com.google.android.gms.maps.model.Marker;
 
 public class InfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
-    private View view;
-
-    private FragmentActivity myContext;
+    private final View view;
 
     @SuppressLint("InflateParams")
     public InfoWindowAdapter(FragmentActivity aContext) {
-        this.myContext = aContext;
 
-        LayoutInflater inflater = (LayoutInflater) myContext.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) aContext.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        view = inflater.inflate(R.layout.parking_marker,
-                null);
+        view = inflater.inflate(R.layout.parking_marker, null);
     }
 
     @Override
-    public View getInfoContents(Marker marker) {
+    public View getInfoContents(@NonNull Marker marker) {
 
-        if (marker != null
-                && marker.isInfoWindowShown()) {
+        if (marker.isInfoWindowShown()) {
             marker.hideInfoWindow();
             marker.showInfoWindow();
+        }else {
+            marker.showInfoWindow();
         }
-        return null;
+        return view;
     }
 
     @Override
-    public View getInfoWindow(final Marker marker) {
+    public View getInfoWindow(@NonNull final Marker marker) {
 
 //        final String title = marker.getTitle();
 //        final TextView titleUi = ((TextView) view.findViewById(R.id.title));

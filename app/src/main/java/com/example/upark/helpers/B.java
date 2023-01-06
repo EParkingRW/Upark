@@ -11,6 +11,7 @@ import com.example.upark.models.Garage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 
@@ -54,7 +55,13 @@ public class B {
         return this.garages;
     }
 
+    public Garage quickFindGarage(String garageId) {
+        return garages.stream().filter(garage -> Objects.equals(garageId, garage.getId())).findAny().orElse(null);
+    }
 
+    public String getToken(){
+        return null;
+    }
 
 
     private static class ListChangedCallback extends ObservableList.OnListChangedCallback<ObservableList<Garage>>{

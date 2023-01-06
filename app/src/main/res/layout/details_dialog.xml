@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_bg">
@@ -18,17 +19,47 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5">
+
+        <TextView
+            android:id="@+id/ff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="@string/_500"
+            android:textColor="@color/main" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="@string/available_slots"
+            android:textColor="@color/black" />
+
+
+    </LinearLayout>
+
     <androidx.cardview.widget.CardView
         android:id="@+id/imageCardView"
         android:layout_width="wrap_content"
         android:layout_height="200dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         app:cardCornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.473"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5"
-        >
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
         <com.example.upark.helpers.CustomImageView
             android:id="@+id/garage_image_view"
             android:layout_width="match_parent"
@@ -61,17 +92,49 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/garage_name" />
 
-    <ImageButton
-        android:id="@+id/imageButton2"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="10dp"
-        android:padding="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageCardView"
-        app:srcCompat="@drawable/ic_outline_bookmark_border_24"
-        android:contentDescription="@string/image" />
+        >
+
+        <ImageButton
+            android:id="@+id/imageButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/image"
+            android:padding="0dp"
+            app:srcCompat="@drawable/ic_outline_bookmark_border_24"
+            tools:ignore="TouchTargetSizeCheck" />
+        <LinearLayout
+            android:layout_marginTop="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/garage_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_regular"
+                android:layout_marginRight="4dp"
+                android:textColor="@color/main"
+                android:text="@string/_2_02"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_regular"
+                android:layout_marginRight="4dp"
+                android:textColor="@color/black"
+                android:text="@string/_hour"/>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
