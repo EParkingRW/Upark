@@ -1,28 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<LinearLayout android:layout_width="wrap_content"
     android:textAlignment="center"
     android:padding="5dp"
     android:background="@drawable/main_color_rounded"
-    android:layout_height="wrap_content">
-
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/availableSpaces"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/montserrat_regular"
         android:layout_marginRight="4dp"
         android:textColor="@color/white"
         android:layout_weight="1"
-        android:text="2.3k" />
-    <TextView
-        android:id="@+id/breakLine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/montserrat_regular"
-        android:textColor="@color/white"
-        android:layout_weight="1"
-        android:text="/" />
+        android:text="@string/_500" />
     <TextView
         android:id="@+id/unit"
         android:layout_width="wrap_content"
@@ -31,7 +22,7 @@
         android:layout_marginLeft="4dp"
         android:textColor="@color/white"
         android:layout_weight="1"
-        android:text="hour" />
+        android:text="@string/spaces" />
 
 
 </LinearLayout>

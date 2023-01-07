@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 
+import com.example.upark.databinding.DetailsDialogBinding;
 import com.example.upark.helpers.B;
 import com.example.upark.helpers.ImageLoadTask;
 import com.example.upark.helpers.InfoWindowAdapter;
@@ -62,11 +63,9 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
 
     // dialog variables
     private Dialog dialog;
-    private Button close_btn;
-    private Button showDetails;
-    private TextView garage_name;
-    private TextView garage_address;
-    private ImageView garage_image_view;
+    private DetailsDialogBinding dialogBinding;
+
+    //others
     private final Map<Marker, Garage> markerGarageMap;
 
     public LocationsFragment() {
@@ -180,10 +179,6 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
             }
 
         }));
-        mMap.setOnMarkerClickListener(marker -> {
-            showGarageDialog(markerGarageMap.get(marker));
-            return false;
-        });
         mMap.setOnInfoWindowClickListener(marker -> showGarageDialog(markerGarageMap.get(marker)));
     }
     private void showGarageDialog(Garage garage) {
@@ -192,29 +187,28 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         if(dialog == null){
             dialog = new Dialog(this.requireActivity());
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.setContentView(R.layout.details_dialog);
+            dialogBinding = DetailsDialogBinding.inflate(getLayoutInflater());
 
-            close_btn = dialog.findViewById(R.id.close_btn);
-            showDetails = dialog.findViewById(R.id.details_btn);
-            garage_name = dialog.findViewById(R.id.garage_name);
-            garage_address = dialog.findViewById(R.id.garage_address);
-            garage_image_view = dialog.findViewById(R.id.garage_image_view);
+            dialog.setContentView(dialogBinding.getRoot());
+
 
             dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
             dialog.getWindow().setGravity(Gravity.BOTTOM);
         }
-        garage_name.setText(garage.getName());
-        garage_address.setText(garage.getAddress());
+        dialogBinding.garageName.setText(garage.getName());
+        dialogBinding.garageAddress.setText(garage.getAddress());
+        dialogBinding.availableSlots.setText(String.valueOf(garage.getAvailableSlots().getValue()));
+        dialogBinding.garagePrice.setText(String.valueOf(garage.getHourFees()));
         try {
-            Consumer<Bitmap> onImageReady = (image) -> garage_image_view.setImageBitmap(image);
+            Consumer<Bitmap> onImageReady = (image) -> dialogBinding.garageImageView.setImageBitmap(image);
             new ImageLoadTask(garage.getImageURL(), onImageReady).execute();
         }catch (Exception e){e.printStackTrace();}
 
-        close_btn.setOnClickListener(listener -> dialog.dismiss());
+        dialogBinding.closeBtn.setOnClickListener(listener -> dialog.dismiss());
         Intent intent = new Intent(this.requireActivity(), GarageDetails.class);
-        showDetails.setOnClickListener(view -> {
+        dialogBinding.detailsBtn.setOnClickListener(view -> {
             try {
                 dialog.dismiss();
                 intent.putExtra("garageId", garage.getId());
@@ -236,9 +230,8 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         LatLng sydney = new LatLng(garage.getLatitude(), garage.getLongitude());
 
         Log.d("GPSTag", "the use location gotten ");
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        MarkerOptions markerOptions = new MarkerOptions().position(sydney).title(garage.getName())
-                // below line is use to add custom marker on our map.
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(sydney).title(garage.getId())
                 .icon(BitmapFromVector(this.requireContext(), R.drawable.ic_baseline_local_parking_24));
         Marker myMarker = mMap.addMarker(markerOptions);
         markerGarageMap.put(myMarker, garage);

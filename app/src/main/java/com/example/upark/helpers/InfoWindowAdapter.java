@@ -1,27 +1,34 @@
 package com.example.upark.helpers;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.Observable;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
 
-import com.example.upark.R;
+import com.example.upark.databinding.ParkingMarkerBinding;
+import com.example.upark.models.Garage;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 public class InfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     private final View view;
+    private final String TAG = this.getClass().getSimpleName();
+    private final ParkingMarkerBinding binding;
+    private FragmentActivity aContext;
 
     @SuppressLint("InflateParams")
     public InfoWindowAdapter(FragmentActivity aContext) {
+        this.aContext = aContext;
+        //        LayoutInflater inflater = (LayoutInflater) aContext.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        LayoutInflater inflater = (LayoutInflater) aContext.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        view = inflater.inflate(R.layout.parking_marker, null);
+//        view = inflater.inflate(R.layout.parking_marker, null);
+        binding = ParkingMarkerBinding.inflate(aContext.getLayoutInflater());
+        view = binding.getRoot();
     }
 
     @Override
@@ -38,29 +45,19 @@ public class InfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoWindow(@NonNull final Marker marker) {
+        String garageId = marker.getTitle();
+        Garage garage = B.getInstance().quickFindGarage(garageId);
 
-//        final String title = marker.getTitle();
-//        final TextView titleUi = ((TextView) view.findViewById(R.id.title));
-//        if (title != null) {
-//            titleUi.setText(title);
-//        } else {
-//            titleUi.setText("");
-//            titleUi.setVisibility(View.GONE);
-//        }
-//
-//        final String snippet = marker.getSnippet();
-//        final TextView snippetUi = ((TextView) view
-//                .findViewById(R.id.snippet));
-//
-//        if (snippet != null) {
-//
-//            String[] SnippetArray = snippet.split(SEPARATOR);
-//
-//
-//            snippetUi.setText(SnippetArray[0]);
-//        } else {
-//            snippetUi.setText("");
-//        }
+        try {
+            garage.getAvailableSlots().observe(aContext, integer -> {
+                binding.availableSpaces.setText(String.valueOf(integer));
+                Log.d(TAG, "new Value" + integer);
+            });
+            binding.availableSpaces.setText(String.valueOf(garage.getAvailableSlots().getValue()));
+        }catch (Exception e){
+            Log.e(TAG, "ERROR :" +e.getMessage());
+        }
+        Log.d(TAG, "garageId : "+garageId);
 
         return view;
     }

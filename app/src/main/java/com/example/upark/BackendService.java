@@ -20,7 +20,7 @@ import io.socket.client.Socket;
 public class BackendService extends Service {
 //    private final SocketBackend socketBackend;
     private final String TAG = this.getClass().getSimpleName();
-    private Socket mSocket;
+
     public BackendService() {
 //        socketBackend = new SocketBackend();
     }
@@ -33,10 +33,8 @@ public class BackendService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Consumer<Garage> onGarage = (garage -> {
-            Log.d("garage_message", garage.toString());
-        });
-        B.getInstance().getGarages(this,onGarage);
+        Consumer<Garage> onGarage = (garage -> Log.d(TAG,garage.toString()));
+        B.getInstance().initialLoadGarages(this,onGarage);
 
         initSocket();
         return super.onStartCommand(intent, flags, startId);
@@ -44,13 +42,14 @@ public class BackendService extends Service {
     public void initSocket(){
         SocketHandler.setSocket();
         SocketHandler.establishConnection();
-        mSocket = SocketHandler.getSocket();
+        Socket mSocket = SocketHandler.getSocket();
         mSocket.on("garage", args -> {
             Log.d(TAG, Arrays.toString(args));
             Arrays.stream(args).forEach(eachGarage ->{
                 try {
                     Log.d(TAG, "type of object :"+ eachGarage.getClass().getSimpleName());
                     JSONObject garageJson = ((JSONObject) eachGarage).getJSONObject("data");
+                    Log.d(TAG, "GarageJson: " + garageJson);
                     B.getInstance().addGarage(GarageBackend.getGarageFromJson(garageJson));
 
 

@@ -23,7 +23,7 @@ public class B {
     private final ListChangedCallback listChangedCallback;
     private B(){
         garages = new ObservableArrayList<>();
-        garages.add(T.getStaticGarage());
+        addGarage(T.getStaticGarage());
         listChangedCallback = new ListChangedCallback();
         garages.addOnListChangedCallback(listChangedCallback);
     }
@@ -35,7 +35,14 @@ public class B {
     }
 
     public void addGarage(Garage garage){
-        garages.add(garage);
+        if(garages.contains(garage)){
+            Log.d(this.getClass().getSimpleName(), "garage Exist :" +garage);
+            Garage existingGarage = garages.stream().filter(each -> each.getId().equals(garage.getId())).findAny().orElse(null);
+            Objects.requireNonNull(existingGarage).copy(garage);
+        }else {
+            garages.add(garage);
+        }
+
     }
     public void onGarageReady(Consumer<Garage> garageReceiver) {
         if(garageReceiver == null){
@@ -44,8 +51,9 @@ public class B {
         listChangedCallback.addCallback(garageReceiver);
         garages.forEach(garageReceiver);
     }
-    public void getGarages(Context context, Consumer<Garage> onGarage){
+    public void initialLoadGarages(Context context, Consumer<Garage> onGarage){
         Consumer<List<Garage>> onReady = (garages_) ->{
+            garages.clear();
             garages.addAll(garages_);
             garages.forEach(onGarage);
         };

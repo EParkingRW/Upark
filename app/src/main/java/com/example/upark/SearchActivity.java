@@ -22,6 +22,7 @@ import com.example.upark.adapters.GarageAdapter;
 import com.example.upark.customViews.CustomEditText;
 import com.example.upark.customViews.DrawableClickListener;
 import com.example.upark.helpers.B;
+import com.example.upark.helpers.S;
 import com.google.android.material.button.MaterialButton;
 
 public class SearchActivity extends AppCompatActivity {
@@ -50,6 +51,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        S.addActivity(this);
         try {
             garageAdapter = new GarageAdapter(B.getInstance().getGarages());
             Intent intent = new Intent(this, GarageDetails.class);

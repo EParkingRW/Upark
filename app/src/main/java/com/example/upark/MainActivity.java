@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.activity.ComponentActivity;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 
 import com.example.upark.auth.LetUInActivity;
 import com.example.upark.helpers.B;
+import com.example.upark.helpers.S;
 import com.example.upark.models.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -20,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        S.addActivity(this);
         try {
             bottomNavigationView = findViewById(R.id.bottomNavigationView);
             bottomNavigationView.setSelectedItemId(R.id.homeMenuItem);

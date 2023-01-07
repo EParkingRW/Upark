@@ -2,6 +2,7 @@ package com.example.upark;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.util.Consumer;
+import androidx.databinding.Observable;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,40 +12,29 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.upark.databinding.ParkingLotDetailsBinding;
+import com.example.upark.databinding.ParkingMarkerBinding;
 import com.example.upark.helpers.B;
 import com.example.upark.helpers.ImageLoadTask;
 import com.example.upark.models.Garage;
 
+import java.util.Objects;
+
 public class GarageDetails extends AppCompatActivity {
-
-    // from view variables
-
-    private ImageView garage_image;
-    private TextView garage_name;
-    private TextView garage_address;
-    private TextView garage_distance;
-    private TextView working_time;
-    private TextView garage_description;
-    private TextView price_per_hour;
-
+    private final String TAG = this.getClass().getSimpleName();
+    ParkingLotDetailsBinding binding;
+    Garage garage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.parking_lot_details);
-
-        garage_image = findViewById(R.id.garage_image_view);
-        garage_name = findViewById(R.id.garage_name);
-        garage_address = findViewById(R.id.garage_address);
-        garage_distance = findViewById(R.id.distance);
-        working_time = findViewById(R.id.working_range);
-        garage_description = findViewById(R.id.garage_description);
-        price_per_hour = findViewById(R.id.price_per_hour);
+        binding = ParkingLotDetailsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         Button close_btn = findViewById(R.id.close_btn);
 
         Intent intent = getIntent();
         try {
             String garageId = intent.getStringExtra("garageId");
-            Garage garage =  B.getInstance().quickFindGarage(garageId);
+            garage =  B.getInstance().quickFindGarage(garageId);
 
             setFieldValues(garage);
 
@@ -53,21 +43,44 @@ public class GarageDetails extends AppCompatActivity {
         }
         close_btn.setOnClickListener(v ->finish());
     }
-    public void setFieldValues(Garage garage){
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         try {
-            garage_name.setText(garage.getName());
-            garage_address.setText(garage.getAddress());
-            garage_distance.setText(R.string._kg);
-            working_time.setText(garage.getWorkingTime());
-            garage_description.setText(garage.getDescription());
-            price_per_hour.setText(garage.getHourFeesDisplay());
+            Objects.requireNonNull(garage).updateAvailableSlots(this::runOnUiThread);
+        }catch (Exception e){Log.e(TAG, "Error: "+ e.getMessage());}
+
+    }
+
+    public void setFieldValues(Garage garage){
+        Runnable fillData = () ->{
+            try {
+
+                binding.garageName.setText(garage.getName());
+                binding.garageAddress.setText(garage.getAddress());
+                binding.distance.setText(R.string._kg);
+                binding.workingRange.setText(garage.getWorkingTime());
+                binding.garageDescription.setText(garage.getDescription());
+                binding.pricePerHour.setText(garage.getHourFeesDisplay());
+                binding.availableSlots.setText(String.valueOf(garage.getAvailableSlots().getValue()));
+                binding.totalSlots.setText(String.valueOf(garage.getSlots()));
 
 
+                Consumer<Bitmap> onImageRead = (image) -> binding.garageImageView.setImageBitmap(image);
+                new ImageLoadTask(garage.getImageURL(), onImageRead).execute();
+            }catch (Exception e){
+                e.printStackTrace();
+                Log.e(TAG, "Error: "+e.getMessage());
 
-            Consumer<Bitmap> onImageRead = (image) -> garage_image.setImageBitmap(image);
-            new ImageLoadTask(garage.getImageURL(), onImageRead).execute();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+            }
+        };
+
+        garage.getAvailableSlots().observe(this, integer -> {
+            Log.d(TAG, "Available slots: " + integer);
+            binding.availableSlots.setText(String.valueOf(integer));
+        });
+        fillData.run();
+
     }
 }

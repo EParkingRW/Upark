@@ -78,15 +78,48 @@
 
             <ImageButton
                 android:id="@+id/imageButton2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:contentDescription="@string/image"
                 android:padding="0dp"
+                app:srcCompat="@drawable/ic_outline_bookmark_border_24"
+                tools:ignore="TouchTargetSizeCheck"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageCardView"
-                app:srcCompat="@drawable/ic_outline_bookmark_border_24" />
+
+                />
+            <LinearLayout
+                android:id="@+id/linearLayout552"
+                android:layout_width="match_parent"
+                android:layout_height="83dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_light_x_sm"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/garage_description">
+
+                <TextView
+                    android:id="@+id/price_per_hour"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:gravity="center"
+                    android:text="@string/_2_02"
+                    android:textColor="@color/main"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/textView1355"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_regular"
+                    android:gravity="center"
+                    android:text="@string/per_hour" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/linearLayout"
@@ -124,7 +157,6 @@
                     android:id="@+id/working_range"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/rounded_with_main_stroke"
                     android:drawablePadding="6dp"
                     android:fontFamily="@font/montserrat_regular"
                     android:gravity="center"
@@ -147,7 +179,7 @@
                 android:text="@string/description"
                 android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
             <TextView
                 android:id="@+id/garage_description"
@@ -164,44 +196,78 @@
                 android:id="@+id/close_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:background="@drawable/rounded_light_x_sm"
                 android:text="@string/close"
                 android:textAllCaps="false"
                 android:theme="@style/Theme.light_main"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout552" />
 
             <LinearLayout
                 android:id="@+id/linearLayout2"
                 android:layout_width="match_parent"
-                android:layout_height="83dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/rounded_light_x_sm"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/garage_description">
-
-                <TextView
-                    android:id="@+id/price_per_hour"
-                    android:layout_width="match_parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:gravity="center"
-                    android:text="@string/_2_02"
-                    android:textColor="@color/main"
-                    android:textSize="24sp" />
+                    android:layout_weight="1"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:background="@drawable/rounded_gray_light_x_sm"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/availableSlots"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:gravity="center"
+                        android:text="@string/_500"
+                        android:textColor="@color/main"
+                        android:textSize="24sp" />
 
-                <TextView
-                    android:id="@+id/textView13"
-                    android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/textView13"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_regular"
+                        android:gravity="center"
+                        android:text="@string/available_slots" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="@string/per_hour" />
+                    android:layout_weight="1"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_marginLeft="4dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/totalSlots"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_bold"
+                        android:gravity="center"
+                        android:text="@string/_500"
+                        android:textColor="@color/black"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/textView1d3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/montserrat_regular"
+                        android:gravity="center"
+                        android:text="@string/total_slots" />
+                </LinearLayout>
+
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

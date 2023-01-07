@@ -64,4 +64,6 @@
     <string name="space_available">Space available</string>
     <string name="makuza_has_a_space_to_park">Makuza has a space to park</string>
     <string name="space_full">Space full</string>
+    <string name="spaces">Spaces</string>
+    <string name="total_slots">Total slots</string>
 </resources>

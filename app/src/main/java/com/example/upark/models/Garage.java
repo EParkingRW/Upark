@@ -1,19 +1,26 @@
 package com.example.upark.models;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.upark.helpers.T;
+
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class Garage implements Serializable {
-    private String id;
+    private final String id;
     private String name;
     private double latitude;
     private double longitude;
     private String imageURL;
     private String CompanyId; // company
     private double hourFees;
-    private int startTime; // ex: 8
-    private int endTime; // ex : 9
+    private String openingTime; // ex: 8
+    private String closingTime; // ex : 9
     private String address;
     private String description;
     private int slots;
@@ -21,22 +28,23 @@ public class Garage implements Serializable {
     private final MutableLiveData<Integer> availableSlots;
     private String userId;
 
-    public Garage(double latitude, double longitude, int slots){
+    public Garage(double latitude, double longitude, int slots, String id){
+        this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
         this.slots = slots;
         this.availableSlots = new MutableLiveData<>(slots);
+        updateAvailableSlots();
     }
-    public Garage(){
+    public Garage(String id){
         this.availableSlots = new MutableLiveData<>();
+        this.takenSlots = 0;
+        this.slots = 0;
+        this.id = id;
     }
 
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -87,20 +95,20 @@ public class Garage implements Serializable {
         this.hourFees = hourFees;
     }
 
-    public int getStartTime() {
-        return startTime;
+    public String getOpeningTime() {
+        return openingTime;
     }
 
-    public void setStartTime(int startTime) {
-        this.startTime = startTime;
+    public void setOpeningTime(String openingTime) {
+        this.openingTime = openingTime;
     }
 
-    public int getEndTime() {
-        return endTime;
+    public String getClosingTime() {
+        return closingTime;
     }
 
-    public void setEndTime(int endTime) {
-        this.endTime = endTime;
+    public void setClosingTime(String closingTime) {
+        this.closingTime = closingTime;
     }
 
     public String getDescription() {
@@ -117,6 +125,7 @@ public class Garage implements Serializable {
 
     public void setSlots(int slots) {
         this.slots = slots;
+        updateAvailableSlots();
     }
 
     public int getTakenSlots() {
@@ -125,6 +134,7 @@ public class Garage implements Serializable {
 
     public void setTakenSlots(int takenSlots) {
         this.takenSlots = takenSlots;
+        updateAvailableSlots();
     }
 
     public MutableLiveData<Integer> getAvailableSlots() {
@@ -140,7 +150,7 @@ public class Garage implements Serializable {
     }
 
     public String getWorkingTime() {
-        return startTime + ":00 - " + endTime + ":00";
+        return openingTime + " - " + closingTime;
     }
     public String getHourFeesDisplay(){
         return "RWF " + hourFees;
@@ -154,6 +164,7 @@ public class Garage implements Serializable {
         this.userId = userId;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Garage{" +
@@ -164,8 +175,8 @@ public class Garage implements Serializable {
                 ", imageURL='" + imageURL + '\'' +
                 ", CompanyId='" + CompanyId + '\'' +
                 ", hourFees=" + hourFees +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
+                ", startTime=" + openingTime +
+                ", endTime=" + closingTime +
                 ", address='" + address + '\'' +
                 ", description='" + description + '\'' +
                 ", slots=" + slots +
@@ -173,5 +184,50 @@ public class Garage implements Serializable {
                 ", availableSlots=" + availableSlots +
                 ", userId='" + userId + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Garage garage = (Garage) o;
+        return Objects.equals(id, garage.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    public void copy(Garage garage) {
+        Runnable runnable = () ->{
+            this.name = garage.getName();
+            this.latitude = garage.getLatitude();
+            this.longitude = garage.getLongitude();
+            this.imageURL = garage.getImageURL();
+            this.CompanyId = garage.getCompanyId();
+            this.hourFees = garage.getHourFees();
+            this.openingTime = garage.getOpeningTime();
+            this.closingTime = garage.getClosingTime();
+            this.address = garage.getAddress();
+            this.description = garage.getDescription();
+            this.slots = garage.getSlots();
+            this.takenSlots = garage.getTakenSlots();
+            this.userId = garage.getUserId();
+        };
+        runnable.run();
+
+
+        updateAvailableSlots();
+    }
+    public void updateAvailableSlots(Consumer<Runnable> runOnUiThread){
+        Runnable runnable = () -> {
+            availableSlots.setValue(slots - takenSlots);
+            Log.d("GarageClass", "Value: "+ availableSlots.getValue());
+        };
+        runOnUiThread.accept(runnable);
+    }
+    public void updateAvailableSlots(){
+        updateAvailableSlots(T::runOnUiThread);
     }
 }
