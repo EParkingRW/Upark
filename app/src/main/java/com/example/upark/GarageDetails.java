@@ -1,21 +1,19 @@
 package com.example.upark;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.util.Consumer;
-import androidx.databinding.Observable;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.util.Consumer;
 
 import com.example.upark.databinding.ParkingLotDetailsBinding;
-import com.example.upark.databinding.ParkingMarkerBinding;
 import com.example.upark.helpers.B;
 import com.example.upark.helpers.ImageLoadTask;
+import com.example.upark.helpers.S;
+import com.example.upark.helpers.T;
 import com.example.upark.models.Garage;
 
 import java.util.Objects;
@@ -49,6 +47,8 @@ public class GarageDetails extends AppCompatActivity {
         super.onResume();
         try {
             Objects.requireNonNull(garage).updateAvailableSlots(this::runOnUiThread);
+            Objects.requireNonNull(garage).updateDistance(S.getMyLocation(),this::runOnUiThread);
+
         }catch (Exception e){Log.e(TAG, "Error: "+ e.getMessage());}
 
     }
@@ -59,12 +59,17 @@ public class GarageDetails extends AppCompatActivity {
 
                 binding.garageName.setText(garage.getName());
                 binding.garageAddress.setText(garage.getAddress());
-                binding.distance.setText(R.string._kg);
                 binding.workingRange.setText(garage.getWorkingTime());
                 binding.garageDescription.setText(garage.getDescription());
                 binding.pricePerHour.setText(garage.getHourFeesDisplay());
                 binding.availableSlots.setText(String.valueOf(garage.getAvailableSlots().getValue()));
                 binding.totalSlots.setText(String.valueOf(garage.getSlots()));
+                Double distance = garage.getDistanceInKm().getValue();
+                if( distance != null && distance >= 0.0){
+                    binding.distance.setText(T.formatDistanceInKm(distance));
+                }else {
+                    binding.distance.setText(R.string._kg);
+                }
 
 
                 Consumer<Bitmap> onImageRead = (image) -> binding.garageImageView.setImageBitmap(image);
@@ -79,6 +84,11 @@ public class GarageDetails extends AppCompatActivity {
         garage.getAvailableSlots().observe(this, integer -> {
             Log.d(TAG, "Available slots: " + integer);
             binding.availableSlots.setText(String.valueOf(integer));
+        });
+        garage.getDistanceInKm().observe(this, distance -> {
+            Log.d(TAG, "Distance in kg : " + distance);
+            String d = T.formatDistanceInM(distance);
+            binding.distance.setText(d);
         });
         fillData.run();
 

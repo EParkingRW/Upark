@@ -25,14 +25,14 @@ import java.util.List;
 public class GarageBackend {
     private static final String TAG = GarageBackend.class.getSimpleName();
     public static void getGarages(Context context, Consumer<List<Garage>> onGaragesReady){
-        Log.d("TAG", "getData");
+        Log.d(TAG, "getData");
 
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, Const.BACKEND_URL+Endpoints.garages, null,
                 response -> {
                     final List<Garage> garages = new ArrayList<>();
                     try {
-                        Log.d("RESPONSE", response.toString());
+                        Log.d(TAG, "RESPONSE :"+ response.toString());
                         if(response.getInt("status") != 200){
                             throw new Resources.NotFoundException("Garage not found");
                         }
@@ -44,16 +44,17 @@ public class GarageBackend {
                                 garages.add(getGarageFromJson(eachGarage));
                             }catch (Exception e){
                                 e.printStackTrace();
-                                Log.e("Garage conversion fail", e.getMessage());
+                                Log.e(TAG,"Garage conversion fail: "+ e.getMessage());
                             }
 
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        Log.d(TAG, "Error: " + e.getMessage());
                     }
 
                     onGaragesReady.accept(garages);
-                }, error -> Log.d("fetch-ERROR", error.toString()));
+                }, error -> Log.d(TAG,"fetch-ERROR:"+ error.toString()));
 //        {
 //            @Override
 //            public Map<String, String> getHeaders() {

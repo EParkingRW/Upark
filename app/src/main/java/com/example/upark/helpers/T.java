@@ -4,13 +4,19 @@ import android.util.Log;
 
 import androidx.core.util.Consumer;
 
+import com.example.upark.helpers.functions.Haversine;
 import com.example.upark.models.Garage;
+import com.google.android.gms.maps.model.LatLng;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class T {
+    private final static ArrayList<java.util.function.Consumer<LatLng>> userLocationSubscribers = new ArrayList<>();
+
     public static Garage getStaticGarage(){
         Garage garage = new Garage(-1.9427915708395525, 30.059941500484385,200,getUUID());
         garage.setHourFees(200);
@@ -39,7 +45,7 @@ public class T {
             Consumer<Boolean> onComplete = (isComp) -> {
                 if(!isComp){
                     count.incrementAndGet();
-                    if(count.get() == S.activities.size()){
+                    if(count.get() == S.getActivities().size()){
                         isSuccess.accept(false);
                     }
                 }else {
@@ -47,7 +53,7 @@ public class T {
                     isSuccess.accept(true);
                 }
             };
-            S.activities.forEach(each->{
+            S.getActivities().forEach(each->{
                 try {
                     if(!complete.get()){
                         each.runOnUiThread(() ->{
@@ -61,5 +67,28 @@ public class T {
         }catch (Exception e){
             isSuccess.accept(false);
         }
+    }
+    public static double distanceBetweenCoordinates(double startLat, double startLong,
+                                  double endLat, double endLong) {
+        return Haversine.distance(startLat, startLong, endLat, endLong);
+    }
+
+    public static void subScribeToUserLocation(java.util.function.Consumer<LatLng> subscriber){
+        if(S.getMyLocation() != null){
+            subscriber.accept(S.getMyLocation());
+        }
+        userLocationSubscribers.add(subscriber);
+    }
+    public static void updateSubscribers(){
+        userLocationSubscribers.forEach(each -> each.accept(S.getMyLocation()));
+    }
+
+    public static String formatDistanceInKm(double value){
+        DecimalFormat df = new DecimalFormat("#.###");
+        return  df.format(value) + " km";
+    }
+    public static String formatDistanceInM(double value){
+        DecimalFormat df = new DecimalFormat("####");
+        return  df.format(value*1000) + " m";
     }
 }

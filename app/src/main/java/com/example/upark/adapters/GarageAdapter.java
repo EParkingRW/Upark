@@ -1,14 +1,18 @@
 package com.example.upark.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.activity.ComponentActivity;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.upark.R;
+import com.example.upark.databinding.ParkingMarkerBinding;
+import com.example.upark.databinding.SearchedGarageCardBinding;
 import com.example.upark.models.Garage;
 
 import java.util.List;
@@ -17,10 +21,8 @@ import java.util.function.Consumer;
 public class GarageAdapter extends RecyclerView.Adapter<GarageViewHolder> {
     private static final int VIEW_TYPE_FOOTER = 1;
     private static final int VIEW_TYPE_CELL = 2;
-    List<Garage> garages;
-    GarageViewHolder garageViewHolder;
-//    Button attempt;
-    public static Consumer<Garage> onClickListener;
+    private List<Garage> garages;
+    private Consumer<Garage> onClickListener;
 
     public void setListener(Consumer<Garage> listener){
         onClickListener = listener;
@@ -41,11 +43,9 @@ public class GarageAdapter extends RecyclerView.Adapter<GarageViewHolder> {
     @Override
     public GarageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if(viewType == VIEW_TYPE_CELL){
-            View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.searched_garage_card,parent,false);
+            SearchedGarageCardBinding binding = SearchedGarageCardBinding.inflate(LayoutInflater.from(parent.getContext()));
+            return new GarageViewHolder(binding);
 
-//        attempt = view.findViewById(R.id.class_Enter);
-//        attempt.setOnClickListener(selectingTaskListener);
-            return new GarageViewHolder(view);
         }
         else {
             TextView text = new TextView(parent.getContext());
@@ -65,7 +65,6 @@ public class GarageAdapter extends RecyclerView.Adapter<GarageViewHolder> {
             final Garage garage = garages.get(position);
             holder.bind(garage, ()-> onClickListener.accept(garage));
         }
-        garageViewHolder = holder;
 
     }
 

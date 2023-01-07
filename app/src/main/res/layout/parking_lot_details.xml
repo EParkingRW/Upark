@@ -144,7 +144,7 @@
                     android:paddingTop="5dp"
                     android:paddingRight="10dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/_2_km"
+                    android:text="@string/_km"
                     android:textColor="@color/main"
                     app:drawableLeftCompat="@drawable/ic_baseline_location_on_24" />
 

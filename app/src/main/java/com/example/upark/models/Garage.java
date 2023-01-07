@@ -6,8 +6,10 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.upark.helpers.T;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -26,6 +28,8 @@ public class Garage implements Serializable {
     private int slots;
     private int takenSlots;
     private final MutableLiveData<Integer> availableSlots;
+    private final MutableLiveData<Double> distanceInKm;
+
     private String userId;
 
     public Garage(double latitude, double longitude, int slots, String id){
@@ -34,13 +38,20 @@ public class Garage implements Serializable {
         this.longitude = longitude;
         this.slots = slots;
         this.availableSlots = new MutableLiveData<>(slots);
+        this.distanceInKm = new MutableLiveData<>(-1.0);
         updateAvailableSlots();
+        subscribeUserLocation();
     }
     public Garage(String id){
         this.availableSlots = new MutableLiveData<>();
         this.takenSlots = 0;
         this.slots = 0;
         this.id = id;
+        this.distanceInKm = new MutableLiveData<>(-1.0);
+        subscribeUserLocation();
+    }
+    private void subscribeUserLocation(){
+        T.subScribeToUserLocation(this::updateDistance);
     }
 
     public String getId() {
@@ -90,6 +101,10 @@ public class Garage implements Serializable {
     public double getHourFees() {
         return hourFees;
     }
+    public int getAvailableSlotsValue(){
+        Integer value = availableSlots.getValue();
+        return value!=null? value:-1 ;
+    }
 
     public void setHourFees(double hourFees) {
         this.hourFees = hourFees;
@@ -126,6 +141,30 @@ public class Garage implements Serializable {
     public void setSlots(int slots) {
         this.slots = slots;
         updateAvailableSlots();
+    }
+
+    public MutableLiveData<Double> getDistanceInKm() {
+        return distanceInKm;
+    }
+    public String getDisplayDistance(){
+        Double value = getDistanceInKm().getValue();
+        if(value == null){
+            return "";
+        }
+        return T.formatDistanceInM(value);
+    }
+    public int getDistanceInMeter(){
+        Double value = distanceInKm.getValue();
+        if(value == null){
+            return -1;
+        }
+        if(value < 0){
+            return -1;
+        }
+        return (int)(value*1000);
+    }
+    public void setDistanceInKm(double distanceInKm){
+        this.distanceInKm.setValue(distanceInKm);
     }
 
     public int getTakenSlots() {
@@ -229,5 +268,49 @@ public class Garage implements Serializable {
     }
     public void updateAvailableSlots(){
         updateAvailableSlots(T::runOnUiThread);
+    }
+    public void updateDistance(LatLng latLng,Consumer<Runnable> runOnUiThread){
+        if(latLng == null){
+            return;
+        }
+        double distance = T.distanceBetweenCoordinates(
+                this.getLatitude(), this.getLongitude(),
+                latLng.latitude, latLng.longitude);
+        Runnable runnable = ()-> setDistanceInKm(distance);
+        runOnUiThread.accept(runnable);
+    }
+    public void updateDistance(LatLng latLng){
+        updateDistance(latLng, T::runOnUiThread);
+    }
+    public boolean contains(String text){
+        try {
+            if(text == null){
+                return false;
+            }
+            String searchString = text.toLowerCase(Locale.ROOT);
+            if(this.getName().contains(searchString)){
+                return true;
+            }
+            else if(Objects.requireNonNull(this.getAddress()).contains(searchString)){
+                return true;
+            }
+            else if((this.getAvailableSlots().getValue()+"").contains(searchString)){
+                return true;
+            }
+            else if((this.getDistanceInMeter()+"").contains(searchString)){
+                return true;
+            }
+            else if((this.getHourFees()+"").contains(searchString)){
+                return true;
+            }
+            else if((this.getDescription()).contains(searchString)){
+                return true;
+            }
+            else return getWorkingTime().contains(searchString);
+
+
+        }catch (Exception e){
+            return false;
+        }
     }
 }

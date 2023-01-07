@@ -4,12 +4,14 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,10 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
@@ -33,9 +32,15 @@ import com.example.upark.databinding.DetailsDialogBinding;
 import com.example.upark.helpers.B;
 import com.example.upark.helpers.ImageLoadTask;
 import com.example.upark.helpers.InfoWindowAdapter;
+import com.example.upark.helpers.S;
 import com.example.upark.models.Garage;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -45,6 +50,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +64,8 @@ import java.util.Map;
  */
 public class LocationsFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationClient;
+    private final String TAG = this.getClass().getSimpleName();
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
 
     // TODO: Rename and change types of parameters
     private GoogleMap mMap;
@@ -154,6 +164,41 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
+    protected LocationRequest createLocationRequest() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return locationRequest;
+    }
+    protected void promptUserToChangeSetting(Task<LocationSettingsResponse> task){
+        promptUserToChangeSetting(task, ()->{});
+    }
+    protected void promptUserToChangeSetting(Task<LocationSettingsResponse> task, Runnable onGPSReady){
+        task.addOnSuccessListener(this.requireActivity(), locationSettingsResponse -> {
+            // All location settings are satisfied. The client can initialize
+            // location requests here.
+            // ...
+            Log.d(TAG, "task.addOnSuccessListener runs");
+            onGPSReady.run();
+        });
+
+        task.addOnFailureListener(requireActivity(), e -> {
+            if (e instanceof ResolvableApiException) {
+                // Location settings are not satisfied, but this can be fixed
+                // by showing the user a dialog.
+                try {
+                    // Show the dialog by calling startResolutionForResult(),
+                    // and check the result in onActivityResult().
+                    ResolvableApiException resolvable = (ResolvableApiException) e;
+                    resolvable.startResolutionForResult(requireActivity(),
+                            REQUEST_CHECK_SETTINGS);
+                } catch (IntentSender.SendIntentException sendEx) {
+                    // Ignore the error.
+                }
+            }
+        });
+    }
     @Override @RequiresPermission(anyOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -162,11 +207,22 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         try {
             mMap.setMyLocationEnabled(true);
         }catch (Exception e){e.printStackTrace();}
+        try {
+            LocationRequest locationRequest = createLocationRequest();
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                    .addLocationRequest(locationRequest);
+
+            SettingsClient client = LocationServices.getSettingsClient(this.requireActivity());
+            Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+            promptUserToChangeSetting(task, this::addListenerOnUserLocationChange);
+
+        }catch (Exception e){Log.e(TAG, "Error: "+e.getMessage());}
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener( this.requireActivity(), location -> {
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
                         LatLng sydney = new LatLng(location.getLatitude(), location.getLongitude());
+                        S.setMyLocation(sydney);
                         Log.d("location", "your location is "+ sydney);
                     }
                 });
@@ -222,7 +278,19 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         dialog.show();
 
     }
+    public void addListenerOnUserLocationChange(){
+        try {
+            mMap.setOnMyLocationChangeListener(location -> {
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                S.setMyLocation(latLng);
+                String value = location.toString();
+                Log.d(TAG, "new user Location : "+ value);
+            });
+        }catch (Exception e){
+            Log.e(TAG, "Error: " + e.getMessage());
+        }
 
+    }
     public void showGarage(Garage garage){
         if(garage == null){
             return;

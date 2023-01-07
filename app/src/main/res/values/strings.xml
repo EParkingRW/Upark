@@ -66,4 +66,5 @@
     <string name="space_full">Space full</string>
     <string name="spaces">Spaces</string>
     <string name="total_slots">Total slots</string>
+    <string name="_km">_km</string>
 </resources>
