@@ -21,9 +21,11 @@ public class B {
     private final ObservableArrayList<Garage> garages;
     private static B instance;
     private final ListChangedCallback listChangedCallback;
+    private final ArrayList<Consumer<List<Garage>>> onInitialFetchCallBack;
     private B(){
+        onInitialFetchCallBack = new ArrayList<>();
         garages = new ObservableArrayList<>();
-        addGarage(T.getStaticGarage());
+//        addGarage(T.getStaticGarage());
         listChangedCallback = new ListChangedCallback();
         garages.addOnListChangedCallback(listChangedCallback);
     }
@@ -56,8 +58,15 @@ public class B {
             garages.clear();
             garages.addAll(garages_);
             garages.forEach(onGarage);
+            onInitialFetchCallBack.forEach(each -> each.accept(garages));
         };
         GarageBackend.getGarages(context, onReady);
+    }
+    public void onInitialGarage(Consumer<List<Garage>> onGarages){
+        if(garages.size() > 0){
+            onGarages.accept(garages);
+        }
+        onInitialFetchCallBack.add(onGarages);
     }
     public ObservableArrayList<Garage> getGarages(){
         return this.garages;

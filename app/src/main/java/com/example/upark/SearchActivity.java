@@ -31,7 +31,6 @@ import com.example.upark.models.Garage;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 public class SearchActivity extends AppCompatActivity {
@@ -72,7 +71,7 @@ public class SearchActivity extends AppCompatActivity {
 
 
             Toolbar toolbar = findViewById(R.id.appBar);
-            RecyclerView garageListRecycler = findViewById(R.id.garageListRecycler);
+            RecyclerView garageListRecycler = findViewById(R.id.HistoryListRecycler);
 
             toolbar.setNavigationOnClickListener(v -> finish());
 

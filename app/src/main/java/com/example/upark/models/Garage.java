@@ -6,14 +6,17 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.upark.helpers.T;
+import com.example.upark.interfaces.TriConsumer;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 public class Garage implements Serializable {
+    private final String TAG  = Garage.class.getSimpleName();
     private final String id;
     private String name;
     private double latitude;
@@ -29,10 +32,12 @@ public class Garage implements Serializable {
     private int takenSlots;
     private final MutableLiveData<Integer> availableSlots;
     private final MutableLiveData<Double> distanceInKm;
+    private final ArrayList<TriConsumer<Garage, Integer, Integer>> availableSpaceSubscriber;
 
     private String userId;
 
     public Garage(double latitude, double longitude, int slots, String id){
+        this.availableSpaceSubscriber = new ArrayList<>();
         this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -43,7 +48,8 @@ public class Garage implements Serializable {
         subscribeUserLocation();
     }
     public Garage(String id){
-        this.availableSlots = new MutableLiveData<>();
+        this.availableSpaceSubscriber = new ArrayList<>();
+        this.availableSlots = new MutableLiveData<>(0);
         this.takenSlots = 0;
         this.slots = 0;
         this.id = id;
@@ -260,9 +266,23 @@ public class Garage implements Serializable {
         updateAvailableSlots();
     }
     public void updateAvailableSlots(Consumer<Runnable> runOnUiThread){
+        int newValue = slots - takenSlots;
+        int oldValue = 0;
+        if (availableSlots.getValue() != null){
+            oldValue = availableSlots.getValue();
+        }
+        if(oldValue == newValue){
+            return;
+        }
+        int finalOldValue = oldValue;
         Runnable runnable = () -> {
             availableSlots.setValue(slots - takenSlots);
             Log.d("GarageClass", "Value: "+ availableSlots.getValue());
+            try {
+                availableSpaceSubscriber.forEach(each -> each.accept(this, finalOldValue, newValue));
+            }catch (Exception e){
+                Log.e(TAG, "Error :" + e.getMessage());
+            }
         };
         runOnUiThread.accept(runnable);
     }
@@ -312,5 +332,8 @@ public class Garage implements Serializable {
         }catch (Exception e){
             return false;
         }
+    }
+    public void addAvailableSpaceConsumer(TriConsumer<Garage, Integer, Integer> consumer){
+        this.availableSpaceSubscriber.add(consumer);
     }
 }
