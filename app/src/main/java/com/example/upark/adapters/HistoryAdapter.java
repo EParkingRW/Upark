@@ -7,6 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.upark.databinding.HistroyCardBinding;
 import com.example.upark.databinding.NotificationCardBinding;
 import com.example.upark.models.History;
 
@@ -38,7 +39,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
     @Override
     public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if(viewType == VIEW_TYPE_CELL){
-            NotificationCardBinding binding = NotificationCardBinding.inflate(LayoutInflater.from(parent.getContext()));
+            HistroyCardBinding binding = HistroyCardBinding.inflate(LayoutInflater.from(parent.getContext()));
             return new HistoryViewHolder(binding);
 
         }

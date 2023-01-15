@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import com.example.upark.R;
@@ -21,7 +20,7 @@ public class LetUInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login2);
 
-        sign_in = findViewById(R.id.login_btn);
+        sign_in = findViewById(R.id.sign_btn);
         sign_up = findViewById(R.id.sign_up_btn);
         sign_with_google = findViewById(R.id.continue_with_google);
 
@@ -37,6 +36,14 @@ public class LetUInActivity extends AppCompatActivity {
                 }
                 this.startActivity(signInIntent[0]);
             });
+            final Intent[] signUpIntent = {null};
+            sign_up.setOnClickListener(view -> {
+                if(signUpIntent[0] == null){
+                    signUpIntent[0] = new Intent(this, SignUpActivity.class);
+                }
+                this.startActivity(signUpIntent[0]);
+            });
+
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -1,6 +1,7 @@
 package com.example.upark.models;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class History {
     public final HistoryType historyType;
@@ -12,7 +13,7 @@ public class History {
         this.message = message;
         this.createdAt = new Date();
     }
-    public static enum HistoryType{
+    public enum HistoryType{
         MESSAGE_FULL("MESSAGE FULL"),
         SPACE_AVAILABLE("SPACE AVAILABLE"),
         NEW_GARAGE("NEW GARAGE"),
@@ -25,5 +26,18 @@ public class History {
             return description;
         }
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        History history = (History) o;
+        return historyType == history.historyType && message.equals(history.message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(historyType, message);
     }
 }

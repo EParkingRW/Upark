@@ -28,12 +28,15 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 
+import com.example.upark.auth.LetUInActivity;
+import com.example.upark.auth.ProfileFragment;
 import com.example.upark.databinding.DetailsDialogBinding;
 import com.example.upark.helpers.B;
 import com.example.upark.helpers.ImageLoadTask;
 import com.example.upark.helpers.InfoWindowAdapter;
 import com.example.upark.helpers.S;
 import com.example.upark.models.Garage;
+import com.example.upark.models.User;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -53,9 +56,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,6 +69,7 @@ import java.util.Map;
  */
 public class LocationsFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationClient;
+    private BottomNavigationView bottomNavigationView;
     private final String TAG = this.getClass().getSimpleName();
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
 
@@ -138,6 +144,27 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
             }
             startActivity(searchIntent[0]);
         });
+
+        try {
+            bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+            bottomNavigationView.setSelectedItemId(R.id.homeMenuItem);
+
+
+
+
+
+
+
+
+
+
+
+            addListeners();
+        }catch (Exception e){
+            Log.e(TAG, "Error: "+ e.getMessage());
+        }
+
+
 
         return view;
     }
@@ -308,5 +335,27 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
         if(myMarker != null){
             myMarker.showInfoWindow();
         }
+    }
+    private void addListeners() {
+        AtomicReference<ProfileFragment> profileFragment = new AtomicReference<>(null);
+
+        AtomicReference<Intent> letUInIntent = new AtomicReference<>(null);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if(id == R.id.meMenuItem){
+                if(B.getInstance().getToken() == null){
+                    if(letUInIntent.get() == null){
+                        letUInIntent.set(new Intent(this.requireActivity(), LetUInActivity.class));
+                    }
+                    startActivity(letUInIntent.get());
+                } else {
+                    if (profileFragment.get() == null){
+                        profileFragment.set(com.example.upark.auth.ProfileFragment.newInstance(new User()));
+                    }
+                    requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, profileFragment.get()).commit();
+                }
+            }
+            return true;
+        });
     }
 }

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.upark.adapters.HistoryAdapter;
+import com.example.upark.adapters.VerticalSpaceItemDecoration;
 import com.example.upark.helpers.B;
 import com.example.upark.models.Garage;
 import com.example.upark.models.History;
@@ -65,14 +66,15 @@ public class HistoryFragment extends Fragment {
         try {
             Toolbar toolbar = view.findViewById(R.id.appBar);
             TextView toolBarTitle = toolbar.findViewById(R.id.title);
-            toolBarTitle.setText(R.string.history);
-            toolbar.setNavigationIcon(null);
+            toolbar.setNavigationOnClickListener(v -> requireActivity().finish());
 
+            toolBarTitle.setText(R.string.notification);
             RecyclerView historyRecycler = view.findViewById(R.id.HistoryListRecycler);
 
             historyRecycler.setLayoutManager(new LinearLayoutManager(this.requireContext()));
             historyRecycler.setVerticalScrollBarEnabled(true);
             historyRecycler.setAdapter(historyAdapter);
+            historyRecycler.addItemDecoration(new VerticalSpaceItemDecoration(48));
 
 
             addListenerOnGarages();
@@ -99,10 +101,13 @@ public class HistoryFragment extends Fragment {
     private void createAvailableChangeHistory(Garage garage, int oldValue, int newValue){
         String message = "Garage "+garage.getName()+" available slots become "+ newValue;
         History history = new History(History.HistoryType.AVAILABLE_SPACE_CHANGE, message);
+        if(histories.contains(history)){
+           return ;
+        }
         addHistory(history);
     }
     private void addHistory(History history){
-        histories.add(history);
-        historyAdapter.notifyItemInserted(histories.size() - 1);
+        histories.add(0,history);
+        historyAdapter.notifyItemInserted(0);
     }
 }

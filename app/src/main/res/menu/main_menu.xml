@@ -6,10 +6,10 @@
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_baseline_bookmark_24"
         />
-    <item android:id="@+id/historyMenuItem"
-        android:title="@string/history"
+    <item android:id="@+id/goMenuItem"
+        android:title="@string/go"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_baseline_list_alt_24"
+        android:icon="@drawable/ic_baseline_directions_car_24"
         />
     <item android:id="@+id/homeMenuItem"
         android:title="@string/home"

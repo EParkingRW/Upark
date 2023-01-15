@@ -67,4 +67,10 @@
     <string name="spaces">Spaces</string>
     <string name="total_slots">Total slots</string>
     <string name="_km">_km</string>
+    <string name="full_name">Full name</string>
+    <string name="username">Username</string>
+    <string name="_250_7">+250 7..</string>
+    <string name="company_name">Company name</string>
+    <string name="login">Login</string>
+    <string name="go">Go</string>
 </resources>

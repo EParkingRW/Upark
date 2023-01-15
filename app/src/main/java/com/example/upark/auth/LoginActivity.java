@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import com.example.upark.MainActivity;
-import com.example.upark.MapsActivity;
 import com.example.upark.R;
 
 public class LoginActivity extends AppCompatActivity {
@@ -17,7 +16,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        login_btn = findViewById(R.id.login_btn);
+        login_btn = findViewById(R.id.sign_btn);
 
         addListeners();
     }

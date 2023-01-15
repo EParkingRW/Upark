@@ -5,15 +5,15 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.upark.databinding.NotificationCardBinding;
+import com.example.upark.databinding.HistroyCardBinding;
 import com.example.upark.models.History;
 
 public class HistoryViewHolder extends RecyclerView.ViewHolder {
     private final String TAG = HistoryViewHolder.class.getSimpleName();
-    private final NotificationCardBinding binding;
+    private final HistroyCardBinding binding;
     private final View view;
 
-    public HistoryViewHolder(@NonNull NotificationCardBinding binding) {
+    public HistoryViewHolder(@NonNull HistroyCardBinding binding) {
         super(binding.getRoot());
         this.binding = binding;
         view = null;
@@ -23,7 +23,7 @@ public class HistoryViewHolder extends RecyclerView.ViewHolder {
         this.view = itemView;
         binding = null;
     }
-    public NotificationCardBinding getBinding(){
+    public HistroyCardBinding getBinding(){
         return binding;
     }
     public void bind(final History history){

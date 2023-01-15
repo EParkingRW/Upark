@@ -1,11 +1,8 @@
 package com.example.upark;
 
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.example.upark.helpers.S;
 
@@ -17,17 +14,6 @@ public class NotificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         S.addActivity(this);
         setContentView(R.layout.activity_notification);
-        try {
-            Toolbar toolbar = findViewById(R.id.appBar);
-            TextView toolBarTitle = toolbar.findViewById(R.id.title);
-            toolBarTitle.setText(R.string.notification);
-
-
-            setSupportActionBar(toolbar);
-            toolbar.setNavigationOnClickListener(v -> finish());
-        }catch (Exception e){
-            Log.e(TAG, "Error: " + e.getMessage());
-        }
 
     }
 }
