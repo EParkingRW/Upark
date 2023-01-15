@@ -209,24 +209,25 @@ public class Garage implements Serializable {
         this.userId = userId;
     }
 
-    @NonNull
     @Override
     public String toString() {
         return "Garage{" +
-                "id='" + id + '\'' +
+                ", id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", imageURL='" + imageURL + '\'' +
                 ", CompanyId='" + CompanyId + '\'' +
                 ", hourFees=" + hourFees +
-                ", startTime=" + openingTime +
-                ", endTime=" + closingTime +
+                ", openingTime='" + openingTime + '\'' +
+                ", closingTime='" + closingTime + '\'' +
                 ", address='" + address + '\'' +
                 ", description='" + description + '\'' +
                 ", slots=" + slots +
                 ", takenSlots=" + takenSlots +
-                ", availableSlots=" + availableSlots +
+                ", availableSlots=" + availableSlots.getValue() +
+                ", distanceInKm=" + distanceInKm.getValue() +
+                ", availableSpaceSubscriber=" + availableSpaceSubscriber +
                 ", userId='" + userId + '\'' +
                 '}';
     }

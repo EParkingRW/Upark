@@ -30,6 +30,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.upark.auth.LetUInActivity;
 import com.example.upark.auth.ProfileFragment;
+import com.example.upark.components.GoDialog;
 import com.example.upark.databinding.DetailsDialogBinding;
 import com.example.upark.helpers.B;
 import com.example.upark.helpers.ImageLoadTask;
@@ -72,6 +73,7 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
     private BottomNavigationView bottomNavigationView;
     private final String TAG = this.getClass().getSimpleName();
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+    private GoDialog goDialog;
 
     // TODO: Rename and change types of parameters
     private GoogleMap mMap;
@@ -354,6 +356,11 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
                     }
                     requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, profileFragment.get()).commit();
                 }
+            }else if(id == R.id.goMenuItem){
+                if(goDialog == null){
+                    goDialog = new GoDialog(this.requireActivity());
+                }
+                goDialog.show();
             }
             return true;
         });
