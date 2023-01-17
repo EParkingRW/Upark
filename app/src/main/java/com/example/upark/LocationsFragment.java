@@ -11,7 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -19,7 +18,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
@@ -54,8 +55,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -78,6 +77,7 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
     Marker DestinationMarker;
     Marker hiddenGarageMarker;
     private Garage correspondingGarageForHiddenMarker;
+    private PopupWindow goDestinationPopup;
 
     // TODO: Rename and change types of parameters
     private GoogleMap mMap;
@@ -90,6 +90,8 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
     //others
     private final Map<Marker, Garage> markerGarageMap;
     private final Map<Garage, MarkerOptions> markerOptionsMap;
+
+    private View goDestinationView;
 
     public LocationsFragment() {
         // Required empty public constructor
@@ -172,6 +174,11 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
             Log.e(TAG, "Error: "+ e.getMessage());
         }
 
+        try {
+            goDestinationView = inflater.inflate(R.layout.destination_location_view, null);
+
+            goDestinationPopup = new PopupWindow(goDestinationView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        }catch (Exception e){Log.e(TAG, "error:"+e.getMessage());}
 
 
         return view;
