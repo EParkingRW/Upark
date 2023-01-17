@@ -13,4 +13,5 @@ public abstract class GarageViewHolder extends RecyclerView.ViewHolder{
     }
     public abstract void bind(final Garage garage);
     public abstract void bind(final Garage garage, Runnable onClick);
+    public void addIndividualListener(int id, Runnable onClick){};
 }

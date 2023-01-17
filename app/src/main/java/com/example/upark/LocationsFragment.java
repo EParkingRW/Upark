@@ -61,6 +61,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -74,6 +75,9 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
     private final String TAG = this.getClass().getSimpleName();
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
     private GoDialog goDialog;
+    Marker DestinationMarker;
+    Marker hiddenGarageMarker;
+    private Garage correspondingGarageForHiddenMarker;
 
     // TODO: Rename and change types of parameters
     private GoogleMap mMap;
@@ -85,10 +89,12 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
 
     //others
     private final Map<Marker, Garage> markerGarageMap;
+    private final Map<Garage, MarkerOptions> markerOptionsMap;
 
     public LocationsFragment() {
         // Required empty public constructor
         markerGarageMap = new HashMap<>();
+        markerOptionsMap = new HashMap<>();
     }
 
     /**
@@ -264,7 +270,18 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
             }
 
         }));
-        mMap.setOnInfoWindowClickListener(marker -> showGarageDialog(markerGarageMap.get(marker)));
+        mMap.setOnInfoWindowClickListener(marker -> {
+            Garage garage;
+            if(Objects.equals(marker, DestinationMarker)){
+                garage = correspondingGarageForHiddenMarker;
+            }else{
+                garage = markerGarageMap.get(marker);
+            }
+            if(garage == null){
+                return;
+            }
+            showGarageDialog(garage);
+        });
     }
     private void showGarageDialog(Garage garage) {
 
@@ -332,6 +349,7 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
                 .icon(BitmapFromVector(this.requireContext(), R.drawable.ic_baseline_local_parking_24));
         Marker myMarker = mMap.addMarker(markerOptions);
         markerGarageMap.put(myMarker, garage);
+        markerOptionsMap.put(garage, markerOptions);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney,10));
         if(myMarker != null){
@@ -358,11 +376,36 @@ public class LocationsFragment extends Fragment implements OnMapReadyCallback {
                 }
             }else if(id == R.id.goMenuItem){
                 if(goDialog == null){
-                    goDialog = new GoDialog(this.requireActivity());
+                    goDialog = new GoDialog(this.requireActivity(), this::startRouting);
                 }
                 goDialog.show();
             }
             return true;
         });
+    }
+    public void startRouting(Garage garage){
+        goDialog.close();
+        if(hiddenGarageMarker != null){
+            hiddenGarageMarker.setVisible(true);
+
+        }
+        if(DestinationMarker != null){
+            DestinationMarker.remove();
+        }
+        markerGarageMap.forEach((marker, garageM) ->{
+            if(Objects.equals(garage, garageM)){
+                marker.setVisible(false);
+                correspondingGarageForHiddenMarker = garageM;
+                hiddenGarageMarker = marker;
+            }
+        });
+        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(garage.getLatitude(), garage.getLongitude())).title("Destination");
+        markerOptions.icon(BitmapFromVector(this.requireContext(), R.drawable.ic_baseline_my_location_36));
+        DestinationMarker = mMap.addMarker(markerOptions);
+        try {
+            Objects.requireNonNull(DestinationMarker).setTitle(garage.getId());
+        }catch (Exception e){
+            Log.e(TAG, "Error: "+e.getMessage());
+        }
     }
 }

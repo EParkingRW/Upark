@@ -52,4 +52,12 @@ public class GarageViewHolder2 extends GarageViewHolder{
         bind(garage);
         binding.getRoot().setOnClickListener(v -> onClick.run());
     }
+
+    @Override
+    public void addIndividualListener(int id, Runnable onClick) {
+        try {
+            binding.getRoot().findViewById(id).setOnClickListener(v -> onClick.run());
+        }catch (Exception e){Log.e(TAG, "Error: "+e.getMessage());}
+
+    }
 }
